@@ -40,15 +40,25 @@ inputUpload.addEventListener("change", async (evento) => {
 const inputTags = document.getElementById("input-tags");
 const listaTags = document.getElementById("lista-tags");
 
-inputTags.addEventListener("keypress", (evento) => {
+inputTags.addEventListener("keypress", async (evento) => {
     if (evento.key === "Enter") {
         evento.preventDefault();
         const tagTexto = inputTags.value.trim();
         if (tagTexto !== "") {
-            const tagNova = document.createElement("li");
-            tagNova.innerHTML = `<p>${tagTexto}</p> <img src="./img/close-black.svg" class="remove-tag">`;
-            listaTags.appendChild(tagNova);
-            inputTags.value = "";
+            try {
+                const tagExiste = await verificaTagsDisponiveis(tagTexto);
+                if (tagExiste) {
+                    const tagNova = document.createElement("li");
+                    tagNova.innerHTML = `<p>${tagTexto}</p> <img src="./img/close-black.svg" class="remove-tag">`;
+                    listaTags.appendChild(tagNova);
+                    inputTags.value = "";
+                } else {
+                    alert("Tag não foi encontrada!");
+                }
+            } catch (error) {
+                console.error("Erro ao verificar a existência da tag");
+                alert("Erro ao verificar a existência da tag. Verifique o console.")
+            }
         }
     }
 })
@@ -59,3 +69,15 @@ listaTags.addEventListener("click", (evento) => {
         listaTags.removeChild(tagQueQueremosRemover);
     }
 })
+
+const tagsDisponiveis = ["Front-End", "Programação", "Data Science", "Full-stack", "HTML", "CSS", "JavaScript"];
+
+// Em uma situação real, a busca por termos de tags possíveis seria em uma API e isso levaria algum tempo. Por isso o uso de função assíncrona. Tbm por se tratar de uma simulação, não será usado o reject, pois aqui não haverá erro na busca dentro de um array.
+
+async function verificaTagsDisponiveis(tagTexto) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(tagsDisponiveis.includes(tagTexto));
+        }, 1000)
+    })
+}
